@@ -1,0 +1,5 @@
+<additional>
+
+    <vType id="passenger" vClass="passenger" color='249,249,250' maxSpeed="27" />
+
+</additional>
