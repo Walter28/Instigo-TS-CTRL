@@ -115,6 +115,7 @@ class SumoEnvironment(gym.Env):
         self.total_co2_emission = 0
         self.total_fuel_consumption = 0
         self.seen_vehicles = set ()
+        self.halted_vehicles = set()
         self.reward_range = (-float("inf"), float("inf"))
         self.episode = 0
         self.metrics = []
@@ -346,19 +347,24 @@ class SumoEnvironment(gym.Env):
         #     len(self.vehicles)
         # ]
         # average_speed = [self.traffic_signals[ts].get_average_speed() for ts in self.ts_ids]
+
         lane_temp = ["n_t_0", "n_t_1", "s_t_0", "s_t_1","w_t_0", "w_t_1", "e_t_0", "e_t_1"]
         co2, time, fuel = self.traffic_signal.get_vehicle_metrics_on_lanes(lane_temp)
+        # stopped = [self.traffic_signal.get_total_queued(lane_temp)]
+        # self.total_stopped += sum(stopped)
+
+        # print("+++++++++++++++ AGENT Total Stoped : ", self.total_stopped)
         
-            
         info = {}
         # for i, ts in enumerate(self.ts_ids):
         #     info[f"{ts}_stopped"] = stopped[i]
         #     info[f"{ts}_accumulated_waiting_time"] = accumulated_waiting_time[i]
         #     info[f"{ts}_average_speed"] = average_speed[i]
-        # info["agents_total_stopped"] = sum(stopped)
+        # info["agent_total_stopped"] = sum(stopped)
         # info["agents_total_accumulated_waiting_time"] = sum(accumulated_waiting_time)
         
         info["agent_total_vehicles_passed"] = [len(self.seen_vehicles)]
+        info["agent_total_stopped"] = [len(self.halted_vehicles)]
         info["agent_total_fuel_consumption"] = [self.total_fuel_consumption]
         info["agent_co2_emission"] = [self.total_co2_emission]
         info["agent_accumulated_waiting_time"] = [self.total_waiting_time]

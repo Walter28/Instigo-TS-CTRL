@@ -12,8 +12,10 @@
         <!-- <route-files value="osm.passenger_old.trips.xml, osm.emergency.trips.xml, osm.police.trips.xml, osm.fire.trips.xml, 
         osm.taxi.trips.xml, osm.motorcycle.trips.xml , osm.bus.trips.xml, osm.truck.trips.xml"/> -->
 
-        <route-files value="osm.passenger_old.trips.xml, osm.motorcycle.trips.xml, osm.taxi.trips.xml,
-        osm.truck.trips.xml, osm.emergency.trips.xml, osm.fire.trips.xml"/>
+        <!-- <route-files value="osm.passenger_old.trips.xml, osm.motorcycle.trips.xml, osm.taxi.trips.xml,
+        osm.truck.trips.xml, osm.emergency.trips.xml, osm.fire.trips.xml"/> -->
+
+        <route-files value="osm-17h-18h-real-scenario.passenger.trips.xml" />
 
         <!-- <route-files value="osm.passenger.trips.xml, osm.motorcycle.trips.xml, osm.taxi.trips.xml"/> -->
 

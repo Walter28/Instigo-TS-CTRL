@@ -9,7 +9,7 @@ from typing import Callable, Optional, Tuple, Union, List
 
 # Configuration
 sumoBinary = sumolib.checkBinary('sumo-gui')
-sumoCmd = [sumoBinary, "-c", "network_trainning/single-intersection-new.sumocfg"]
+sumoCmd = [sumoBinary, "-c", "network_trainning/single-intersection-real-scenario.sumocfg"]
 # sumoCmd = [sumoBinary, "-c", "network/osm.sumocfg"]
 
 # Variables globales pour stocker les informations collectées
@@ -17,10 +17,12 @@ vehicle_info = {}  # Structure: {vehicle_id: {"waitTime": value, "co2Emission": 
 metrics = []
 sim_step = 0
 seen_vehicles = set()
+total_stopped = 0 # Initialize the total stop to 0
 total_co2_emission = 0.0  # Initialize total CO2 emission to 0
 total_waiting_time = 0.0  # Initialize total waiting time to 0
 total_fuel_consumption = 0.0  # Initialize total fuel consumption to 0
-max_steps = 5004
+halted_vehicles = set()
+max_steps = 3600
 
 def run_simulation():
     global sim_step
@@ -34,9 +36,12 @@ def run_simulation():
         step += 1
     traci.close()
 
-    save_csv("outputs_pretimed/default_control_VHVH2.csv", 0)
+    save_csv("outputs_pretimed/default_control_17h-18h.csv", 0)
     
-
+def get_total_queued(in_lanes) -> int:
+        """Returns the total number of vehicles halting in the intersection."""
+        return sum(traci.lane.getLastStepHaltingNumber(lane) for lane in in_lanes)
+    
 def get_vehicle_metrics_on_lanes(lanes: List[str]) -> Tuple[float, float, float]:
         """Calculates the total CO2 emission, total waiting time, and total fuel consumption of vehicles on specified lanes.
         
@@ -54,6 +59,7 @@ def get_vehicle_metrics_on_lanes(lanes: List[str]) -> Tuple[float, float, float]
         global total_waiting_time
         global total_fuel_consumption
         global seen_vehicles
+        global halted_vehicles
         
         for lane in lanes:
             veh_list = traci.lane.getLastStepVehicleIDs(lane)  # Get list of vehicles on lane
@@ -68,6 +74,17 @@ def get_vehicle_metrics_on_lanes(lanes: List[str]) -> Tuple[float, float, float]
                     fuel_consumption += fuel  # Add fuel consumption to total
                     seen_vehicles.add(veh)  # Add vehicle to set of seen vehicles
                     
+                        
+            # Get the list of vehicles halted on this lane
+            halted_vehicle_count = traci.lane.getLastStepHaltingNumber(lane)      
+            # Get the list of vehicle IDs on this lane
+            vehicle_ids = traci.lane.getLastStepVehicleIDs(lane)            
+            # Filter out only the halted vehicles
+            for vehicle_id in vehicle_ids:
+                if traci.vehicle.getSpeed(vehicle_id) < 0.1:  # vehicle is halted
+                    halted_vehicles.add(vehicle_id)
+                    
+                    
         total_fuel_consumption += fuel_consumption
         total_co2_emission += co2_emission
         total_waiting_time += waiting_time
@@ -77,15 +94,19 @@ def get_vehicle_metrics_on_lanes(lanes: List[str]) -> Tuple[float, float, float]
 def _get_agent_info():
     global total_co2_emission
     global total_waiting_time
+    global total_stopped
     global total_fuel_consumption
     global seen_vehicles
 
     lane_temp = ["n_t_0", "n_t_1", "s_t_0", "s_t_1","w_t_0", "w_t_1", "e_t_0", "e_t_1"]
-    co2, time, fuel = get_vehicle_metrics_on_lanes(lane_temp)
+    co2, time, fuel = get_vehicle_metrics_on_lanes(lane_temp)  
+    stopped = [get_total_queued(lane_temp)]
+    # total_stopped += sum(stopped)
     
     info = {}
     
     info["agent_total_vehicles_passed"] = [len(seen_vehicles)]
+    info["agent_total_stopped"] = [len(halted_vehicles)]
     info["agent_total_fuel_consumption"] = [total_fuel_consumption]
     info["agent_co2_emission"] = [total_co2_emission]
     info["agent_accumulated_waiting_time"] = [total_waiting_time]

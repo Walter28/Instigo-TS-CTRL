@@ -23,4 +23,4 @@ for i in range(100000):
     print(f" Obs : ", obs['nb_veh'])
     print(f" ")
     # # print(f" Observation : ", obs)
-    # print(f" Info : ", info)
+    print(f" Info : ", info)

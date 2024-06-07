@@ -574,6 +574,11 @@ class TrafficSignal:
             
         return wait_time_per_lane, 0, 0
     
+    def get_total_queued(self, in_lanes) -> int:
+        """Returns the total number of vehicles halting in the intersection."""
+        return sum(self.sumo.lane.getLastStepHaltingNumber(lane) for lane in in_lanes)
+    
+    
     def get_vehicle_metrics_on_lanes(self, lanes: List[str]) -> Tuple[float, float, float]:
         """Calculates the total CO2 emission, total waiting time, and total fuel consumption of vehicles on specified lanes.
         
@@ -599,6 +604,19 @@ class TrafficSignal:
                     total_waiting_time += waiting_time  # Add waiting time to total
                     total_fuel_consumption += fuel_consumption  # Add fuel consumption to total
                     self.env.seen_vehicles.add(veh)  # Add vehicle to set of seen vehicles
+                    
+                    # Filter out only the halted vehicles
+                    # if self.sumo.vehicle.getSpeed(veh) < 0.1:  # vehicle is halted
+                    #     self.env.halted_vehicles.add(veh)
+                    
+            # Get the list of vehicles halted on this lane
+            halted_vehicle_count = self.sumo.lane.getLastStepHaltingNumber(lane)      
+            # Get the list of vehicle IDs on this lane
+            vehicle_ids = self.sumo.lane.getLastStepVehicleIDs(lane)            
+            # Filter out only the halted vehicles
+            for vehicle_id in vehicle_ids:
+                if self.sumo.vehicle.getSpeed(vehicle_id) < 0.1:  # vehicle is halted
+                    self.env.halted_vehicles.add(vehicle_id)
                     
         self.env.total_fuel_consumption += total_fuel_consumption
         self.env.total_co2_emission += total_co2_emission

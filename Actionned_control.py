@@ -94,10 +94,11 @@ vehicle_info = {}  # Structure: {vehicle_id: {"waitTime": value, "co2Emission": 
 metrics = []
 sim_step = 0
 seen_vehicles = set()
+halted_vehicles = set()
 total_co2_emission = 0.0  # Initialize total CO2 emission to 0
 total_waiting_time = 0.0  # Initialize total waiting time to 0
 total_fuel_consumption = 0.0  # Initialize total fuel consumption to 0
-max_steps = 4985
+max_steps = 3600
 
 # Configuration
 sumoBinary = sumolib.checkBinary('sumo-gui')
@@ -303,7 +304,7 @@ def main():
     # Arrêter SUMO à la fin de la simulation
     traci.close()
     
-    # save_csv("outputs_actionned/ACTIONNED_control_VHVH2.csv", 0)
+    save_csv("outputs_actionned/ACTIONNED_control_17h-18h.csv", 0)
     
 
 def get_vehicle_metrics_on_lanes(lanes: List[str]) -> Tuple[float, float, float]:
@@ -323,6 +324,7 @@ def get_vehicle_metrics_on_lanes(lanes: List[str]) -> Tuple[float, float, float]
         global total_waiting_time
         global total_fuel_consumption
         global seen_vehicles
+        global halted_vehicles
         
         for lane in lanes:
             veh_list = traci.lane.getLastStepVehicleIDs(lane)  # Get list of vehicles on lane
@@ -336,6 +338,15 @@ def get_vehicle_metrics_on_lanes(lanes: List[str]) -> Tuple[float, float, float]
                     waiting_time += time  # Add waiting time to total
                     fuel_consumption += fuel  # Add fuel consumption to total
                     seen_vehicles.add(veh)  # Add vehicle to set of seen vehicles
+                    
+            # Get the list of vehicles halted on this lane
+            halted_vehicle_count = traci.lane.getLastStepHaltingNumber(lane)      
+            # Get the list of vehicle IDs on this lane
+            vehicle_ids = traci.lane.getLastStepVehicleIDs(lane)            
+            # Filter out only the halted vehicles
+            for vehicle_id in vehicle_ids:
+                if traci.vehicle.getSpeed(vehicle_id) < 0.1:  # vehicle is halted
+                    halted_vehicles.add(vehicle_id)
                     
         total_fuel_consumption += fuel_consumption
         total_co2_emission += co2_emission
@@ -355,6 +366,7 @@ def _get_agent_info():
     info = {}
     
     info["agent_total_vehicles_passed"] = [len(seen_vehicles)]
+    info["agent_total_stopped"] = [len(halted_vehicles)]
     info["agent_total_fuel_consumption"] = [total_fuel_consumption]
     info["agent_co2_emission"] = [total_co2_emission]
     info["agent_accumulated_waiting_time"] = [total_waiting_time]

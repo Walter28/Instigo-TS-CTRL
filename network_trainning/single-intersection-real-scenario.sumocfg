@@ -1,13 +1,7 @@
-<?xml version="1.0" encoding="UTF-8"?>
-
-<!-- generated on 2024-05-07 07:43:05 by Eclipse SUMO sumo Version 1.19.0
--->
-
 <configuration>
     <input>
-        <net-file value="single-intersection-actionned.net.xml"/>
+        <net-file value="single-intersection-new.net.xml"/>
         <route-files value="osm-17h-18h-real-scenario.passenger.trips.xml"/>
-        <additional-files value="single-intersection-actionned.add.xml"/>
     </input>
     <time>
         <begin value="0"/>

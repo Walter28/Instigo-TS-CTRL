@@ -1,0 +1,50 @@
+Pour générer un nombre spécifique de véhicules pour une durée d'une heure, il faut définir le temps de départ de ces véhicules de manière uniforme sur toute la durée de la simulation. En utilisant randomTrips.py, vous pouvez spécifier l'intervalle de départ et la durée maximale de la simulation. Voici comment vous pouvez configurer cela:
+
+    Simulation de 1 heure :
+        1 heure de simulation correspond à 3600 secondes.
+
+    Répartition des véhicules :
+        Vous avez donné le nombre total de véhicules pour chaque route. Nous allons les répartir uniformément sur les 3600 secondes.
+
+    Commandes randomTrips.py :
+        Nous allons ajouter les paramètres --begin, --end, et --period pour s'assurer que les véhicules sont générés sur toute la durée d'une heure.
+
+
+Voici les commandes mises à jour pour chaque route :
+
+1. Pour la route West (496 véhicules)
+
+python randomTrips.py -n osm.net.xml -o osm.west.trips.xml --trip-attributes="departLane=\"best\" departSpeed=\"max\" departPos=\"random\"" --prefix "pas_" --additional-file osm.add.xml --vehicle-class passenger --begin 0 --end 3600 --period 7.25806451613 --edge-from w_t_0 w_t_1 --edge-to t_e_0 t_n_1 t_w_1 t_n_0 t_e_1 t_s_0 t_w_0 t_s_1
+
+    Calcul du period: 3600 / 496 ≈ 7.25806451613 secondes entre chaque départ.
+
+
+
+
+2. Pour la route South (67 véhicules)
+
+python randomTrips.py -n osm.net.xml -o osm.south.trips.xml --trip-attributes="departLane=\"best\" departSpeed=\"max\" departPos=\"random\"" --prefix "pas_" --additional-file osm.add.xml --vehicle-class passenger --begin 0 --end 3600 --period 53.7313432836 --edge-from s_t_0 s_t_1 --edge-to t_e_0 t_n_1 t_w_1 t_n_0 t_e_1 t_s_0 t_w_0 t_s_1
+
+    Calcul du period: 3600 / 67 ≈ 53.7313432836 secondes entre chaque départ.
+
+
+
+
+3. Pour la route East (232 véhicules)
+
+python randomTrips.py -n osm.net.xml -o osm.east.trips.xml --trip-attributes="departLane=\"best\" departSpeed=\"max\" departPos=\"random\"" --prefix "pas_" --additional-file osm.add.xml --vehicle-class passenger --begin 0 --end 3600 --period 15.5172413793 --edge-from e_t_0 e_t_1 --edge-to t_e_0 t_n_1 t_w_1 t_n_0 t_e_1 t_s_0 t_w_0 t_s_1
+
+    Calcul du period: 3600 / 232 ≈ 15.5172413793 secondes entre chaque départ.
+
+
+
+4. Pour la route North (94 véhicules)
+
+python randomTrips.py -n osm.net.xml -o osm.north.trips.xml --trip-attributes="departLane=\"best\" departSpeed=\"max\" departPos=\"random\"" --prefix "pas_" --additional-file osm.add.xml --vehicle-class passenger --begin 0 --end 3600 --period 38.2978723404 --edge-from n_t_0 n_t_1 --edge-to t_e_0 t_n_1 t_w_1 t_n_0 t_e_1 t_s_0 t_w_0 t_s_1
+
+    Calcul du period: 3600 / 94 ≈ 38.2978723404 secondes entre chaque départ.
+
+
+
+ Then Fusionner les fichiers de trips
+
