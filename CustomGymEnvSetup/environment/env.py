@@ -242,7 +242,7 @@ class SumoEnvironment(gym.Env):
         time_to_act = False
         while not time_to_act:
             self._sumo_step()
-            
+            # print("time since : ", self.traffic_signal.time_since_last_phase_change)
             self.traffic_signal.update()
             if self.traffic_signal.time_to_act:
                 time_to_act = True
